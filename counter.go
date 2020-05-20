@@ -60,7 +60,7 @@ func (c *counter) Collect(ch chan<- Metric) {
 		Metric:    c.Desc.fqName,
 		Step:      c.Desc.step,
 		Value:     c.self.Count(),
-		Type:      "Gauge",
+		Type:      CounterValue,
 		Tags:      c.labels,
 		Timestamp: time.Now().Unix(),
 	}
@@ -96,7 +96,7 @@ func (cv *CounterVec) Collect(ch chan<- Metric) {
 			Metric:    cv.Desc.fqName,
 			Step:      cv.Desc.step,
 			Value:     c.self.Count(),
-			Type:      "Gauge",
+			Type:      CounterValue,
 			Tags:      c.labels,
 			Timestamp: time.Now().Unix(),
 		}

@@ -50,7 +50,7 @@ func (g *gauge) Collect(ch chan<- Metric) {
 		Metric:    g.Desc.fqName,
 		Step:      g.Desc.step,
 		Value:     g.self.Value(),
-		Type:      "Gauge",
+		Type:      GaugeValue,
 		Tags:      g.labels,
 		Timestamp: time.Now().Unix(),
 	}
@@ -87,7 +87,7 @@ func (gv *GaugeVec) Collect(ch chan<- Metric) {
 			Metric:    gv.Desc.fqName,
 			Step:      gv.Desc.step,
 			Value:     v.self.Value(),
-			Type:      "Gauge",
+			Type:      GaugeValue,
 			Tags:      v.labels,
 			Timestamp: time.Now().Unix(),
 		}

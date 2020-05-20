@@ -3,7 +3,6 @@ package aura
 import (
 	"bytes"
 	"fmt"
-	"sort"
 	"time"
 )
 
@@ -14,10 +13,6 @@ const (
 	GaugeValue   ValueType = "Gauge"
 )
 
-// todo: rethink tags
-// tags: {status: 200, url: "/index"}
-// tags: {status: 200, url: "/api"}
-// tags: {status: 400, url: "/token"}
 type Metric struct {
 	Endpoint  string
 	Metric    string
@@ -49,42 +44,6 @@ func makeLabelMap(keys []string, values []string) map[string]string {
 	}
 
 	return m
-}
-
-type MetricReported struct {
-	Endpoint  string      `json:"endpoint"`
-	Metric    string      `json:"metric"`
-	Step      uint32      `json:"step"`
-	Value     interface{} `json:"value"`
-	Type      string      `json:"counterType"`
-	Tags      string      `json:"tags"`
-	Timestamp int64       `json:"timestamp"`
-}
-
-func ConvertMetric(m Metric) MetricReported {
-	keys := make([]string, 0)
-	for k := range m.Tags {
-		keys = append(keys, k)
-	}
-
-	sort.Strings(keys)
-	buf := &bytes.Buffer{}
-	for idx, k := range keys {
-		if idx == len(keys)-1 {
-			buf.WriteString(fmt.Sprintf("%s=%s", k, m.Tags[k]))
-			continue
-		}
-		buf.WriteString(fmt.Sprintf("%s=%s,", k, m.Tags[k]))
-	}
-	return MetricReported{
-		Endpoint:  m.Endpoint,
-		Metric:    m.Metric,
-		Step:      m.Step,
-		Value:     m.Value,
-		Type:      string(m.Type),
-		Tags:      buf.String(),
-		Timestamp: m.Timestamp,
-	}
 }
 
 func NewConstMetric(desc *Desc, valueType ValueType, value interface{}, lvs ...string) (Metric, error) {
