@@ -75,6 +75,30 @@ func (h *histogram) switchValues(v HistogramVType) interface{} {
 	return nil
 }
 
+func (h *histogram) popMetricWithHVT(desc *Desc, hvt HistogramVType) Metric {
+	return Metric{
+		Endpoint:  h.labels["endpoint"],
+		Metric:    fmt.Sprintf("%s.%s", desc.fqName, hvt),
+		Step:      desc.step,
+		Value:     h.switchValues(hvt),
+		Type:      GaugeValue,
+		Tags:      h.labels,
+		Timestamp: time.Now().Unix(),
+	}
+}
+
+func (h *histogram) popMetricWithPer(desc *Desc, per float64) Metric {
+	return Metric{
+		Endpoint:  h.labels["endpoint"],
+		Metric:    fmt.Sprintf("%s.%.2f", desc.fqName, per),
+		Step:      desc.step,
+		Value:     h.self.Percentile(per),
+		Type:      GaugeValue,
+		Tags:      h.labels,
+		Timestamp: time.Now().Unix(),
+	}
+}
+
 func (h *histogram) Observe(i int64) {
 	h.self.Update(i)
 }
@@ -87,37 +111,13 @@ func (h *histogram) Describe(ch chan<- *Desc) {
 	ch <- h.Desc
 }
 
-func (h *histogram) popMetricWithHVT(hvt HistogramVType) Metric {
-	return Metric{
-		Endpoint:  h.labels["endpoint"],
-		Metric:    fmt.Sprintf("%s.%s", h.Desc.fqName, hvt),
-		Step:      h.Desc.step,
-		Value:     h.switchValues(hvt),
-		Type:      GaugeValue,
-		Tags:      h.labels,
-		Timestamp: time.Now().Unix(),
-	}
-}
-
-func (h *histogram) popMetricWithPer(per float64) Metric {
-	return Metric{
-		Endpoint:  h.labels["endpoint"],
-		Metric:    fmt.Sprintf("%s.%.2f", h.Desc.fqName, per),
-		Step:      h.Desc.step,
-		Value:     h.self.Percentile(per),
-		Type:      GaugeValue,
-		Tags:      h.labels,
-		Timestamp: time.Now().Unix(),
-	}
-}
-
 func (h *histogram) Collect(ch chan<- Metric) {
 	for _, hvt := range h.opts.HVTypes {
-		ch <- h.popMetricWithHVT(hvt)
+		ch <- h.popMetricWithHVT(h.Desc, hvt)
 	}
 
 	for _, per := range h.opts.Percentiles {
-		ch <- h.popMetricWithPer(per)
+		ch <- h.popMetricWithPer(h.Desc, per)
 	}
 }
 
@@ -151,11 +151,11 @@ func (hv *HistogramVec) Interval() time.Duration {
 func (hv *HistogramVec) Collect(ch chan<- Metric) {
 	for _, v := range hv.histograms {
 		for _, hvt := range v.opts.HVTypes {
-			ch <- v.popMetricWithHVT(hvt)
+			ch <- v.popMetricWithHVT(v.Desc, hvt)
 		}
 
 		for _, per := range v.opts.Percentiles {
-			ch <- v.popMetricWithPer(per)
+			ch <- v.popMetricWithPer(v.Desc, per)
 		}
 	}
 }

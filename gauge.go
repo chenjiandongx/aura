@@ -28,6 +28,18 @@ type GaugeVec struct {
 	interval time.Duration
 }
 
+func (g *gauge) popMetric(desc *Desc) Metric {
+	return Metric{
+		Endpoint:  g.labels["endpoint"],
+		Metric:    desc.fqName,
+		Step:      desc.step,
+		Value:     g.self.Value(),
+		Type:      CounterValue,
+		Tags:      g.labels,
+		Timestamp: time.Now().Unix(),
+	}
+}
+
 func (g *gauge) Update(i float64) {
 	g.self.Update(i)
 }
@@ -45,15 +57,7 @@ func (g *gauge) Describe(ch chan<- *Desc) {
 }
 
 func (g *gauge) Collect(ch chan<- Metric) {
-	ch <- Metric{
-		Endpoint:  g.labels["endpoint"],
-		Metric:    g.Desc.fqName,
-		Step:      g.Desc.step,
-		Value:     g.self.Value(),
-		Type:      GaugeValue,
-		Tags:      g.labels,
-		Timestamp: time.Now().Unix(),
-	}
+	ch <- g.popMetric(g.Desc)
 }
 
 func (gv *GaugeVec) WithLabelValues(lvs ...string) Gauge {
@@ -82,15 +86,7 @@ func (gv *GaugeVec) Interval() time.Duration {
 
 func (gv *GaugeVec) Collect(ch chan<- Metric) {
 	for _, v := range gv.gauges {
-		ch <- Metric{
-			Endpoint:  v.labels["endpoint"],
-			Metric:    gv.Desc.fqName,
-			Step:      gv.Desc.step,
-			Value:     v.self.Value(),
-			Type:      GaugeValue,
-			Tags:      v.labels,
-			Timestamp: time.Now().Unix(),
-		}
+		ch <- v.popMetric(gv.Desc)
 	}
 }
 

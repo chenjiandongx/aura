@@ -30,6 +30,18 @@ type CounterVec struct {
 	interval time.Duration
 }
 
+func (c *counter) popMetric(desc *Desc) Metric {
+	return Metric{
+		Endpoint:  c.labels["endpoint"],
+		Metric:    desc.fqName,
+		Step:      desc.step,
+		Value:     c.self.Count(),
+		Type:      CounterValue,
+		Tags:      c.labels,
+		Timestamp: time.Now().Unix(),
+	}
+}
+
 func (c *counter) Inc(i int64) {
 	c.self.Inc(i)
 }
@@ -55,15 +67,7 @@ func (c *counter) Describe(ch chan<- *Desc) {
 }
 
 func (c *counter) Collect(ch chan<- Metric) {
-	ch <- Metric{
-		Endpoint:  c.labels["endpoint"],
-		Metric:    c.Desc.fqName,
-		Step:      c.Desc.step,
-		Value:     c.self.Count(),
-		Type:      CounterValue,
-		Tags:      c.labels,
-		Timestamp: time.Now().Unix(),
-	}
+	ch <- c.popMetric(c.Desc)
 }
 
 func (cv *CounterVec) WithLabelValues(lvs ...string) Counter {
@@ -91,15 +95,7 @@ func (cv *CounterVec) Describe(ch chan<- *Desc) {
 
 func (cv *CounterVec) Collect(ch chan<- Metric) {
 	for _, c := range cv.counters {
-		ch <- Metric{
-			Endpoint:  c.labels["endpoint"],
-			Metric:    cv.Desc.fqName,
-			Step:      cv.Desc.step,
-			Value:     c.self.Count(),
-			Type:      CounterValue,
-			Tags:      c.labels,
-			Timestamp: time.Now().Unix(),
-		}
+		ch <- c.popMetric(cv.Desc)
 	}
 }
 
