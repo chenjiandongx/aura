@@ -134,6 +134,7 @@ func (hv *HistogramVec) WithLabelValues(lvs ...string) Histogram {
 		hv.histograms[lbp] = &histogram{
 			self:   metrics.NewHistogram(defaultSample),
 			labels: lbm,
+			opts:   hv.opts,
 		}
 	}
 
@@ -151,11 +152,11 @@ func (hv *HistogramVec) Interval() time.Duration {
 func (hv *HistogramVec) Collect(ch chan<- Metric) {
 	for _, v := range hv.histograms {
 		for _, hvt := range v.opts.HVTypes {
-			ch <- v.popMetricWithHVT(v.Desc, hvt)
+			ch <- v.popMetricWithHVT(hv.Desc, hvt)
 		}
 
 		for _, per := range v.opts.Percentiles {
-			ch <- v.popMetricWithPer(v.Desc, per)
+			ch <- v.popMetricWithPer(hv.Desc, per)
 		}
 	}
 }

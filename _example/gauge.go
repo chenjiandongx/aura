@@ -11,12 +11,11 @@ import (
 
 var (
 	interval = 10 * time.Second
-	cpuUsage = aura.NewGaugeVec(
+	cpuUsage = aura.NewGauge(
 		aura.BuildFQName(namespace, subsystem, "cpu.usage"),
 		"CPU usage at current time",
 		step,
 		interval,
-		[]string{"endpoint"},
 	)
 
 	memUsage = aura.NewGaugeVec(
@@ -45,7 +44,7 @@ func main() {
 				pMem, _ := p.MemoryPercent()
 				pCpu, _ := p.CPUPercent()
 
-				cpuUsage.WithLabelValues(pName).Update(pCpu)
+				cpuUsage.Update(pCpu)
 				memUsage.WithLabelValues(pName).Update(float64(pMem))
 			}
 

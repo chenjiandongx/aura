@@ -108,8 +108,8 @@ func (r *Registry) MustRegister(cs ...Collector) {
 }
 
 func (r *Registry) gather() {
-	for _, c := range r.collectors {
-		go func() {
+	for _, collector := range r.collectors {
+		go func(c Collector) {
 			ticker := time.Tick(c.Interval())
 			c.Collect(r.metricChs)
 
@@ -121,7 +121,7 @@ func (r *Registry) gather() {
 					return
 				}
 			}
-		}()
+		}(collector)
 	}
 }
 
