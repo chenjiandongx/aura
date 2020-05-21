@@ -23,20 +23,24 @@ type StreamReporter struct {
 	MaxConcurrency int
 }
 
-func (s *StreamReporter) Report(ch chan aura.Metric) {
-	for i := 0; i < s.MaxConcurrency; i++ {
+func (r *StreamReporter) Report(ch chan aura.Metric) {
+	for i := 0; i < r.MaxConcurrency; i++ {
 		go func() {
 			ms := make([]aura.Metric, 0)
 			for {
 				select {
 				case metric := <-ch:
-					if len(ms) >= s.Batch {
-						s.report(ms)
+					if len(ms) >= r.Batch {
+						if err := r.report(ms); err != nil {
+
+						}
 						ms = make([]aura.Metric, 0)
 					}
 					ms = append(ms, metric)
-				case <-s.Ticker:
-					s.report(ms)
+				case <-r.Ticker:
+					if err := r.report(ms); err != nil {
+
+					}
 					ms = make([]aura.Metric, 0)
 				}
 			}
@@ -44,13 +48,13 @@ func (s *StreamReporter) Report(ch chan aura.Metric) {
 	}
 }
 
-func (s *StreamReporter) Convert(met aura.Metric) interface{} {
+func (r *StreamReporter) Convert(met aura.Metric) interface{} {
 	return met
 }
 
-func (s *StreamReporter) report(mets []aura.Metric) error {
+func (r *StreamReporter) report(mets []aura.Metric) error {
 	for _, met := range mets {
-		if _, err := fmt.Fprintf(s.Writer, "%+v\n", s.Convert(met)); err != nil {
+		if _, err := fmt.Fprintf(r.Writer, "%+v\n", r.Convert(met)); err != nil {
 			return err
 		}
 	}
