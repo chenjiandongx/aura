@@ -50,7 +50,9 @@ func (s *StreamReporter) Convert(met aura.Metric) interface{} {
 
 func (s *StreamReporter) report(mets []aura.Metric) error {
 	for _, met := range mets {
-		fmt.Fprintf(s.Writer, "%+v\n", s.Convert(met))
+		if _, err := fmt.Fprintf(s.Writer, "%+v\n", s.Convert(met)); err != nil {
+			return err
+		}
 	}
 	return nil
 }

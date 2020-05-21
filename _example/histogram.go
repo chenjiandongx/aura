@@ -9,24 +9,26 @@ import (
 )
 
 var (
-	serviceEcho = aura.NewHistogram(
-		"http.service.echo",
-		"http service stats",
+	serviceA = aura.NewHistogram(
+		"http.service.serviceA",
+		"it's the serviceA",
 		15,
 		15*time.Second,
 		&aura.HistogramOpts{
-			HVTypes: []aura.HistogramVType{aura.HVTMin, aura.HVTMax, aura.HVTMean},
+			HVTypes: []aura.HistogramVType{aura.HistogramVTMin, aura.HistogramVTMax, aura.HistogramVTMean},
 		},
 	)
 
-	serviceHome = aura.NewHistogramVec(
-		"http.service.home",
-		"http service stats",
+	serviceB = aura.NewHistogramVec(
+		"http.service.serviceB",
+		"it's the serviceB",
 		15,
 		15*time.Second,
-		[]string{"endpoint"},
+		[]string{"endpoint", "status"},
 		&aura.HistogramOpts{
-			HVTypes:     []aura.HistogramVType{aura.HVTMin, aura.HVTMax, aura.HVTMean, aura.HVTCount},
+			HVTypes: []aura.HistogramVType{
+				aura.HistogramVTMin, aura.HistogramVTMax, aura.HistogramVTMean, aura.HistogramVTCount,
+			},
 			Percentiles: []float64{0.5, 0.75, 0.9, 0.99},
 		},
 	)
@@ -34,17 +36,17 @@ var (
 
 func main() {
 	registry := aura.NewRegistry(nil)
-	registry.MustRegister(serviceEcho, serviceHome)
+	registry.MustRegister(serviceA, serviceB)
 
 	go func() {
 		for range time.Tick(200 * time.Millisecond) {
-			serviceEcho.Observe(rand.Int63() % 1000)
-			serviceHome.WithLabelValues("/api/index").Observe(rand.Int63() % 600)
+			serviceA.Observe(rand.Int63() % 1000)
+			serviceB.WithLabelValues("/api/index", "200").Observe(rand.Int63() % 600)
 		}
 	}()
 
 	registry.AddReporter(reporter.DefaultStreamReporter)
-	
+
 	go registry.Serve("localhost:9090")
 	registry.Run()
 }

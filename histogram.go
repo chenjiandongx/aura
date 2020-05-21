@@ -21,7 +21,7 @@ type HistogramOpts struct {
 var (
 	defaultSample        = metrics.NewExpDecaySample(1028, 0.015)
 	DefaultHistogramOpts = &HistogramOpts{
-		HVTypes:     []HistogramVType{HVTMin, HVTMax, HVTMean},
+		HVTypes:     []HistogramVType{HistogramVTMin, HistogramVTMax, HistogramVTMean},
 		Percentiles: nil,
 	}
 )
@@ -29,13 +29,13 @@ var (
 type HistogramVType string
 
 const (
-	HVTMin      HistogramVType = "min"
-	HVTMax      HistogramVType = "max"
-	HVTMean     HistogramVType = "mean"
-	HVTCount    HistogramVType = "count"
-	HVTStdDev   HistogramVType = "stddev"
-	HVTSum      HistogramVType = "sum"
-	HVTVariance HistogramVType = "variance"
+	HistogramVTMin      HistogramVType = "min"
+	HistogramVTMax      HistogramVType = "max"
+	HistogramVTMean     HistogramVType = "mean"
+	HistogramVTCount    HistogramVType = "count"
+	HistogramVTStdDev   HistogramVType = "stdDev"
+	HistogramVTSum      HistogramVType = "sum"
+	HistogramVTVariance HistogramVType = "variance"
 )
 
 type histogram struct {
@@ -57,19 +57,19 @@ type HistogramVec struct {
 
 func (h *histogram) switchValues(v HistogramVType) interface{} {
 	switch v {
-	case HVTMin:
+	case HistogramVTMin:
 		return h.self.Mean()
-	case HVTMax:
+	case HistogramVTMax:
 		return h.self.Max()
-	case HVTMean:
+	case HistogramVTMean:
 		return h.self.Mean()
-	case HVTCount:
+	case HistogramVTCount:
 		return h.self.Count()
-	case HVTSum:
+	case HistogramVTSum:
 		return h.self.Sum()
-	case HVTStdDev:
+	case HistogramVTStdDev:
 		return h.self.StdDev()
-	case HVTVariance:
+	case HistogramVTVariance:
 		return h.self.Variance()
 	}
 	return nil
