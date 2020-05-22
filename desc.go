@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// BuildFQName joins the given three name components by ".". Empty name components are ignored.
 func BuildFQName(namespace, subsystem, name string) string {
 	if name == "" {
 		return ""
@@ -28,10 +29,6 @@ type Desc struct {
 	help string
 
 	labelKeys []string
-
-	pairs []string
-
-	tags map[string]string
 
 	step uint32
 

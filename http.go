@@ -24,14 +24,15 @@ func (r *Registry) apiMetadata(w http.ResponseWriter, req *http.Request) {
 	w.Write(bs)
 }
 
-func (r *Registry) apiQueue(w http.ResponseWriter, req *http.Request) {
-	w.Write([]byte(fmt.Sprintf("%d", len(r.metricChs))))
+// todo
+func (r *Registry) apiStats(w http.ResponseWriter, req *http.Request) {
+
 }
 
 func (r *Registry) Serve(address string) {
 	http.HandleFunc("/-/health", r.apiHealth)
 	http.HandleFunc("/-/metadata", r.apiMetadata)
-	http.HandleFunc("/-/queue", r.apiQueue)
+	http.HandleFunc("/-/stats", r.apiStats)
 	if err := http.ListenAndServe(address, nil); err != nil {
 		panic(fmt.Sprintf("failed to start http server(%s): %+v", address, err))
 	}

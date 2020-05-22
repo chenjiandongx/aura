@@ -94,7 +94,7 @@ func (t *timer) popMetricWithHVT(desc *Desc, tvt TimerVType) Metric {
 		Step:      desc.step,
 		Value:     t.switchValues(tvt),
 		Type:      GaugeValue,
-		Tags:      t.labels,
+		Labels:    t.labels,
 		Timestamp: time.Now().Unix(),
 	}
 }
@@ -106,7 +106,7 @@ func (t *timer) popMetricWithPer(desc *Desc, per float64) Metric {
 		Step:      desc.step,
 		Value:     t.self.Percentile(per),
 		Type:      GaugeValue,
-		Tags:      t.labels,
+		Labels:    t.labels,
 		Timestamp: time.Now().Unix(),
 	}
 }
@@ -139,8 +139,9 @@ func (t *timer) Collect(ch chan<- Metric) {
 
 func (tv *TimerVec) WithLabelValues(lvs ...string) Timer {
 	if len(tv.Desc.labelKeys) != len(lvs) {
-		// todo: panic message
-		panic("")
+		panic(fmt.Sprintf("timer(%s): expected %d label values but go %d",
+			tv.Desc.fqName, len(tv.Desc.labelKeys), len(lvs)),
+		)
 	}
 	lbp := makeLabelPairs(tv.Desc.fqName, tv.Desc.labelKeys, lvs)
 	lbm := makeLabelMap(tv.Desc.labelKeys, lvs)

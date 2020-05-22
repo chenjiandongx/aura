@@ -82,7 +82,7 @@ func (h *histogram) popMetricWithHVT(desc *Desc, hvt HistogramVType) Metric {
 		Step:      desc.step,
 		Value:     h.switchValues(hvt),
 		Type:      GaugeValue,
-		Tags:      h.labels,
+		Labels:    h.labels,
 		Timestamp: time.Now().Unix(),
 	}
 }
@@ -94,7 +94,7 @@ func (h *histogram) popMetricWithPer(desc *Desc, per float64) Metric {
 		Step:      desc.step,
 		Value:     h.self.Percentile(per),
 		Type:      GaugeValue,
-		Tags:      h.labels,
+		Labels:    h.labels,
 		Timestamp: time.Now().Unix(),
 	}
 }
@@ -123,8 +123,9 @@ func (h *histogram) Collect(ch chan<- Metric) {
 
 func (hv *HistogramVec) WithLabelValues(lvs ...string) Histogram {
 	if len(hv.Desc.labelKeys) != len(lvs) {
-		// todo: panic message
-		panic("")
+		panic(fmt.Sprintf("histogram(%s): expected %d label values but go %d",
+			hv.Desc.fqName, len(hv.Desc.labelKeys), len(lvs)),
+		)
 	}
 	lbp := makeLabelPairs(hv.Desc.fqName, hv.Desc.labelKeys, lvs)
 	lbm := makeLabelMap(hv.Desc.labelKeys, lvs)

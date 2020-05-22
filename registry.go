@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	// Capacity for the channel to collect metrics and descriptors.
-	capMetricChan = 1000
-	capDescChan   = 10
+	// capacity for the channel to collect metrics and descriptors.
+	defaultCapMetricChan = 2500
+	defaultCapDescChan   = 20
 )
 
 type Reporter interface {
@@ -31,6 +31,7 @@ type Registry struct {
 	metricChs  chan Metric
 	metadata   map[string]*MetaData
 	stop       chan struct{}
+	exit       chan struct{}
 }
 
 type RegistryOpts struct {
@@ -39,13 +40,20 @@ type RegistryOpts struct {
 }
 
 var DefaultRegistryOpts = &RegistryOpts{
-	CapMetricChan: capMetricChan,
-	CapDescChan:   capDescChan,
+	CapMetricChan: defaultCapMetricChan,
+	CapDescChan:   defaultCapDescChan,
 }
 
 func NewRegistry(opts *RegistryOpts) *Registry {
 	if opts == nil {
 		opts = DefaultRegistryOpts
+	}
+
+	if opts.CapDescChan < 1 {
+		opts.CapDescChan = defaultCapDescChan
+	}
+	if opts.CapMetricChan < 1 {
+		opts.CapMetricChan = defaultCapMetricChan
 	}
 
 	return &Registry{
@@ -56,6 +64,7 @@ func NewRegistry(opts *RegistryOpts) *Registry {
 		metricChs:  make(chan Metric, opts.CapMetricChan),
 		metadata:   map[string]*MetaData{},
 		stop:       make(chan struct{}),
+		exit:       make(chan struct{}),
 	}
 }
 
@@ -85,7 +94,7 @@ func (r *Registry) Register(c Collector) error {
 		}
 
 		if _, ok := r.metadata[desc.fqName]; ok {
-			return fmt.Errorf("duplicated mertric-fqname:(%s)", desc.fqName)
+			return fmt.Errorf("duplicated mertric FQName:(%s)", desc.fqName)
 		}
 
 		r.metadata[desc.fqName] = &MetaData{
@@ -131,9 +140,12 @@ func (r *Registry) Run() {
 	}
 	r.gather()
 	r.reporter.Report(r.metricChs)
-	<-r.stop
+	<-r.exit
 }
 
 func (r *Registry) Stop() {
-	r.stop <- struct{}{}
+	for i := 0; i < len(r.collectors); i++ {
+		r.stop <- struct{}{}
+	}
+	r.exit <- struct{}{}
 }

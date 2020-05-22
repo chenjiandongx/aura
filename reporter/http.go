@@ -12,7 +12,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-type MetricReported struct {
+type HTTPReportedMetric struct {
 	Endpoint  string      `json:"endpoint"`
 	Metric    string      `json:"metric"`
 	Step      uint32      `json:"step"`
@@ -52,7 +52,7 @@ type HTTPReporter struct {
 
 func (r *HTTPReporter) Convert(m aura.Metric) interface{} {
 	keys := make([]string, 0)
-	for k := range m.Tags {
+	for k := range m.Labels {
 		keys = append(keys, k)
 	}
 
@@ -60,12 +60,12 @@ func (r *HTTPReporter) Convert(m aura.Metric) interface{} {
 	buf := &bytes.Buffer{}
 	for idx, k := range keys {
 		if idx == len(keys)-1 {
-			buf.WriteString(fmt.Sprintf("%s=%s", k, m.Tags[k]))
+			buf.WriteString(fmt.Sprintf("%s=%s", k, m.Labels[k]))
 			continue
 		}
-		buf.WriteString(fmt.Sprintf("%s=%s,", k, m.Tags[k]))
+		buf.WriteString(fmt.Sprintf("%s=%s,", k, m.Labels[k]))
 	}
-	return MetricReported{
+	return HTTPReportedMetric{
 		Endpoint:  m.Endpoint,
 		Metric:    m.Metric,
 		Step:      m.Step,

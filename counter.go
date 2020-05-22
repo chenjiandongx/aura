@@ -1,6 +1,7 @@
 package aura
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
@@ -37,7 +38,7 @@ func (c *counter) popMetric(desc *Desc) Metric {
 		Step:      desc.step,
 		Value:     c.self.Count(),
 		Type:      CounterValue,
-		Tags:      c.labels,
+		Labels:    c.labels,
 		Timestamp: time.Now().Unix(),
 	}
 }
@@ -72,8 +73,9 @@ func (c *counter) Collect(ch chan<- Metric) {
 
 func (cv *CounterVec) WithLabelValues(lvs ...string) Counter {
 	if len(cv.Desc.labelKeys) != len(lvs) {
-		// todo: panic message
-		panic("")
+		panic(fmt.Sprintf("counter(%s): expected %d label values but go %d",
+			cv.Desc.fqName, len(cv.Desc.labelKeys), len(lvs)),
+		)
 	}
 
 	lbp := makeLabelPairs(cv.Desc.fqName, cv.Desc.labelKeys, lvs)

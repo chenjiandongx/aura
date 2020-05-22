@@ -1,6 +1,7 @@
 package aura
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/rcrowley/go-metrics"
@@ -35,7 +36,7 @@ func (g *gauge) popMetric(desc *Desc) Metric {
 		Step:      desc.step,
 		Value:     g.self.Value(),
 		Type:      CounterValue,
-		Tags:      g.labels,
+		Labels:    g.labels,
 		Timestamp: time.Now().Unix(),
 	}
 }
@@ -62,8 +63,9 @@ func (g *gauge) Collect(ch chan<- Metric) {
 
 func (gv *GaugeVec) WithLabelValues(lvs ...string) Gauge {
 	if len(gv.Desc.labelKeys) != len(lvs) {
-		// todo: panic message
-		panic("")
+		panic(fmt.Sprintf("gauge(%s): expected %d label values but go %d",
+			gv.Desc.fqName, len(gv.Desc.labelKeys), len(lvs)),
+		)
 	}
 	lbp := makeLabelPairs(gv.Desc.fqName, gv.Desc.labelKeys, lvs)
 	lbm := makeLabelMap(gv.Desc.labelKeys, lvs)

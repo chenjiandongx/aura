@@ -19,7 +19,7 @@ type Metric struct {
 	Step      uint32
 	Value     interface{}
 	Type      ValueType
-	Tags      map[string]string
+	Labels    map[string]string
 	Timestamp int64
 }
 
@@ -53,18 +53,18 @@ func NewConstMetric(desc *Desc, valueType ValueType, value interface{}, lvs ...s
 		)
 	}
 
-	tags := make(map[string]string)
+	lbs := make(map[string]string)
 	for i, lb := range desc.labelKeys {
-		tags[lb] = lvs[i]
+		lbs[lb] = lvs[i]
 	}
 
 	return Metric{
-		Endpoint:  tags["endpoint"],
+		Endpoint:  lbs["endpoint"],
 		Metric:    desc.fqName,
 		Value:     value,
 		Step:      desc.step,
 		Type:      valueType,
-		Tags:      tags,
+		Labels:    lbs,
 		Timestamp: time.Now().Unix(),
 	}, nil
 }
