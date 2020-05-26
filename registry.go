@@ -120,6 +120,8 @@ func (r *Registry) gather() {
 	for _, collector := range r.collectors {
 		go func(c Collector) {
 			ticker := time.Tick(c.Interval())
+
+			time.Sleep(5 * time.Second)
 			c.Collect(r.metricChs)
 
 			for {
