@@ -35,6 +35,15 @@ type Desc struct {
 	err error
 }
 
+func (d *Desc) IsKeyIn(k string) bool {
+	for _, key := range d.labelKeys {
+		if key == k {
+			return true
+		}
+	}
+	return false
+}
+
 func NewDesc(fqName, help string, step uint32, labelKeys []string) *Desc {
 	d := &Desc{help: help, labelKeys: labelKeys}
 	if fqName == "" {

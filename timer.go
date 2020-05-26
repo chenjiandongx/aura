@@ -143,16 +143,32 @@ func (tv *TimerVec) WithLabelValues(lvs ...string) Timer {
 			tv.Desc.fqName, len(tv.Desc.labelKeys), len(lvs)),
 		)
 	}
+
+	return tv.searchTimer(lvs...)
+}
+
+func (tv *TimerVec) With(labels map[string]string) Timer {
+	for k := range labels {
+		if !tv.Desc.IsKeyIn(k) {
+			panic(fmt.Sprintf("timer(%s): expected label key: %s, but it dosen't exists", tv.Desc.fqName, k))
+		}
+	}
+
+	lvs := make([]string, 0)
+	for _, key := range tv.Desc.labelKeys {
+		lvs = append(lvs, labels[key])
+	}
+
+	return tv.searchTimer(lvs...)
+}
+
+func (tv *TimerVec) searchTimer(lvs ...string) Timer {
 	lbp := makeLabelPairs(tv.Desc.fqName, tv.Desc.labelKeys, lvs)
 	lbm := makeLabelMap(tv.Desc.labelKeys, lvs)
 
 	_, ok := tv.timers[lbp]
 	if !ok {
-		tv.timers[lbp] = &timer{
-			self:   metrics.NewTimer(),
-			labels: lbm,
-			opts:   tv.opts,
-		}
+		tv.timers[lbp] = &timer{self: metrics.NewTimer(), labels: lbm, opts: tv.opts}
 	}
 
 	return tv.timers[lbp]

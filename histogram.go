@@ -127,6 +127,26 @@ func (hv *HistogramVec) WithLabelValues(lvs ...string) Histogram {
 			hv.Desc.fqName, len(hv.Desc.labelKeys), len(lvs)),
 		)
 	}
+
+	return hv.searchHistogram(lvs...)
+}
+
+func (hv *HistogramVec) With(labels map[string]string) Histogram {
+	for k := range labels {
+		if !hv.Desc.IsKeyIn(k) {
+			panic(fmt.Sprintf("histogram(%s): expected label key: %s, but it dosen't exists", hv.Desc.fqName, k))
+		}
+	}
+
+	lvs := make([]string, 0)
+	for _, key := range hv.Desc.labelKeys {
+		lvs = append(lvs, labels[key])
+	}
+
+	return hv.searchHistogram(lvs...)
+}
+
+func (hv *HistogramVec) searchHistogram(lvs ...string) Histogram {
 	lbp := makeLabelPairs(hv.Desc.fqName, hv.Desc.labelKeys, lvs)
 	lbm := makeLabelMap(hv.Desc.labelKeys, lvs)
 

@@ -78,12 +78,32 @@ func (cv *CounterVec) WithLabelValues(lvs ...string) Counter {
 		)
 	}
 
+	return cv.searchCounter(lvs...)
+}
+
+func (cv *CounterVec) With(labels map[string]string) Counter {
+	for k := range labels {
+		if !cv.Desc.IsKeyIn(k) {
+			panic(fmt.Sprintf("counter(%s): expected label key: %s, but it dosen't exists", cv.Desc.fqName, k))
+		}
+	}
+
+	lvs := make([]string, 0)
+	for _, key := range cv.Desc.labelKeys {
+		lvs = append(lvs, labels[key])
+	}
+
+	return cv.searchCounter(lvs...)
+}
+
+func (cv *CounterVec) searchCounter(lvs ...string) Counter {
 	lbp := makeLabelPairs(cv.Desc.fqName, cv.Desc.labelKeys, lvs)
 	lbm := makeLabelMap(cv.Desc.labelKeys, lvs)
 	_, ok := cv.counters[lbp]
 	if !ok {
 		cv.counters[lbp] = &counter{self: metrics.NewCounter(), labels: lbm}
 	}
+
 	return cv.counters[lbp]
 }
 

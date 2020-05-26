@@ -67,6 +67,26 @@ func (gv *GaugeVec) WithLabelValues(lvs ...string) Gauge {
 			gv.Desc.fqName, len(gv.Desc.labelKeys), len(lvs)),
 		)
 	}
+
+	return gv.searchGauge(lvs...)
+}
+
+func (gv *GaugeVec) With(labels map[string]string) Gauge {
+	for k := range labels {
+		if !gv.Desc.IsKeyIn(k) {
+			panic(fmt.Sprintf("gauge(%s): expected label key: %s, but it dosen't exists", gv.Desc.fqName, k))
+		}
+	}
+
+	lvs := make([]string, 0)
+	for _, key := range gv.Desc.labelKeys {
+		lvs = append(lvs, labels[key])
+	}
+
+	return gv.searchGauge(lvs...)
+}
+
+func (gv *GaugeVec) searchGauge(lvs ...string) Gauge {
 	lbp := makeLabelPairs(gv.Desc.fqName, gv.Desc.labelKeys, lvs)
 	lbm := makeLabelMap(gv.Desc.labelKeys, lvs)
 
