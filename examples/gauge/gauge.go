@@ -1,7 +1,6 @@
-package gauge
+package main
 
 import (
-	"github.com/chenjiandongx/aura/examples/desc"
 	"time"
 
 	"github.com/chenjiandongx/aura"
@@ -9,19 +8,25 @@ import (
 	"github.com/shirou/gopsutil/process"
 )
 
+const (
+	namespace = "host"
+	subsystem = "cpu"
+	step      = 10
+)
+
 var (
 	interval = 10 * time.Second
 	cpuUsage = aura.NewGauge(
-		aura.BuildFQName(desc.namespace, desc.subsystem, "cpu.usage"),
+		aura.BuildFQName(namespace, subsystem, "cpu.usage"),
 		"CPU usage at current time",
-		desc.step,
+		step,
 		interval,
 	)
 
 	memUsage = aura.NewGaugeVec(
-		aura.BuildFQName(desc.namespace, desc.subsystem, "mem.usage"),
+		aura.BuildFQName(namespace, subsystem, "mem.usage"),
 		"Memory usage at current time",
-		desc.step,
+		step,
 		interval,
 		[]string{"endpoint"},
 	)

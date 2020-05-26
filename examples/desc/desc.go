@@ -1,4 +1,4 @@
-package desc
+package main
 
 import (
 	"time"

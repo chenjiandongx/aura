@@ -1,4 +1,4 @@
-package timer
+package main
 
 import (
 	"math/rand"

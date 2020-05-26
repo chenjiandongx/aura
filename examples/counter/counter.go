@@ -1,4 +1,4 @@
-package counter
+package main
 
 import (
 	"time"
@@ -16,11 +16,11 @@ var (
 	)
 
 	reqCount = aura.NewCounterVec(
-		"service.requestCount",
+		"service.reqCount",
 		"number of requests",
 		5,
 		5*time.Second,
-		[]string{"endpoint"},
+		[]string{"uri", "statusCode"},
 	)
 )
 
@@ -36,7 +36,8 @@ func main() {
 
 	go func() {
 		for range time.Tick(200 * time.Millisecond) {
-			reqCount.WithLabelValues("/api").Inc(1)
+			reqCount.WithLabelValues("/api", "200").Inc(1)
+			reqCount.With(map[string]string{"uri": "/index", "statusCode": "400"}).Inc(1)
 		}
 	}()
 	registry.AddReporter(reporter.DefaultStreamReporter)

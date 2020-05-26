@@ -1,4 +1,4 @@
-package histogram
+package main
 
 import (
 	"math/rand"
@@ -8,11 +8,15 @@ import (
 	"github.com/chenjiandongx/aura/reporter"
 )
 
+const (
+	step = 15
+)
+
 var (
 	serviceA = aura.NewHistogram(
 		"http.service.serviceA",
-		"it's the serviceA",
-		15,
+		"example:serviceA",
+		step,
 		15*time.Second,
 		&aura.HistogramOpts{
 			HVTypes: []aura.HistogramVType{aura.HistogramVTMin, aura.HistogramVTMax, aura.HistogramVTMean},
@@ -21,8 +25,8 @@ var (
 
 	serviceB = aura.NewHistogramVec(
 		"http.service.serviceB",
-		"it's the serviceB",
-		15,
+		"exmaple:serviceB",
+		step,
 		15*time.Second,
 		[]string{"endpoint", "status"},
 		&aura.HistogramOpts{
