@@ -41,7 +41,7 @@ func (r *StreamReporter) Report(ch chan aura.Metric) {
 				case metric := <-ch:
 					if len(ms) >= r.Batch {
 						if err := r.report(ms); err != nil {
-
+							// what should I do here?
 						}
 						ms = make([]aura.Metric, 0)
 					}

@@ -289,7 +289,8 @@ func main() {
 }
 ```
 
-运行结果
+**运行结果**
+
 ```shell
 ~/project/golang/src/github.com/chenjiandongx/aura/examples/histogram 🤔 go run .
 {Endpoint:echo Metric:http.service.max Step:15 Value:590 Type:Gauge Labels:map[endpoint:echo status:200 uri:/api/index] Timestamp:1590778743}
@@ -303,7 +304,7 @@ func main() {
 ...
 ```
 
-Aura 提供了一些示例位于 examples 文件下；同时也基于 [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter) 开发了 [memcached-eollector](https://github.com/chenjiandongx/memcached-collector)，作为一个标准 collector 写法供使用的同学参考。
+Aura 提供了一些示例位于 [examples](https://github.com/chenjiandongx/aura/tree/master/examples) 文件夹。同时也基于 [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter) 开发了 [memcached-eollector](https://github.com/chenjiandongx/memcached-collector)，作为一个标准 collector 写法供使用的同学参考。
 
 ### 📃 License
 

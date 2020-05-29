@@ -36,16 +36,19 @@ type Registry struct {
 	exit       chan struct{}
 }
 
+// RegistryOpts specifies the buffer size of metric channel and desc channel.
 type RegistryOpts struct {
 	CapMetricChan int
 	CapDescChan   int
 }
 
+// DefaultRegistryOpts holds the RegistryOpts by default case.
 var DefaultRegistryOpts = &RegistryOpts{
 	CapMetricChan: defaultCapMetricChan,
 	CapDescChan:   defaultCapDescChan,
 }
 
+// NewRegistry returns a Registry instance for managing the collecting jobs.
 func NewRegistry(opts *RegistryOpts) *Registry {
 	if opts == nil {
 		opts = DefaultRegistryOpts
@@ -70,10 +73,12 @@ func NewRegistry(opts *RegistryOpts) *Registry {
 	}
 }
 
+// AddReporter adds the reporter to decide where metrics go forward.
 func (r *Registry) AddReporter(reporter Reporter) {
 	r.reporter = reporter
 }
 
+// Register register a collector and handler all its `metrics desc`.
 func (r *Registry) Register(c Collector) error {
 	descChan := make(chan *Desc, r.opts.CapDescChan)
 
