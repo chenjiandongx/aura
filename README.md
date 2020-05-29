@@ -213,21 +213,21 @@ const (
 var (
 	// 声明采集指标
 	echo = aura.NewHistogramVec(
-		"http.service.echo",
+		"http.service",
 		"simple echo service",
 		step,
 		15*time.Second,
-		[]string{"endpoint", "status"},
+		[]string{"endpoint", "uri", "status"},
 		// 直方图上报数据如果指定了 HVTypes/Percentiles 那上报就是计算后的指标
 		// 计算后的指标形式
-		// http.service.echo.min
-		// http.service.echo.max
-		// http.service.echo.mean
-		// http.service.echo.count
-		// http.service.echo.0.50
-		// http.service.echo.0.75
-		// http.service.echo.0.90
-		// http.service.echo.0.99
+		// http.service.min
+		// http.service.max
+		// http.service.mean
+		// http.service.count
+		// http.service.0.50
+		// http.service.0.75
+		// http.service.0.90
+		// http.service.0.99
 		&aura.HistogramOpts{
 			HVTypes: []aura.HistogramVType{
 				aura.HistogramVTMin, aura.HistogramVTMax, aura.HistogramVTMean, aura.HistogramVTCount,
@@ -243,8 +243,12 @@ func main() {
 
 	go func() {
 		for range time.Tick(200 * time.Millisecond) {
-			echo.WithLabelValues("/api/index", "200").Observe(rand.Int63() % 600)
-			echo.WithLabelValues("/api/home", "404").Observe(rand.Int63() % 600)
+			echo.WithLabelValues("echo", "/api/index", "200").Observe(rand.Int63() % 600)
+			echo.With(map[string]string{
+				"endpoint": "echo",
+				"uri":      "/api/noexists",
+				"status":   "404",
+			}).Observe(rand.Int63() % 600)
 		}
 	}()
 
@@ -258,14 +262,14 @@ func main() {
 运行结果
 ```shell
 ~/project/golang/src/github.com/chenjiandongx/aura/examples/histogram 🤔 go run .
-{Endpoint:/api/index Metric:http.service.serviceB.min Step:15 Value:414 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
-{Endpoint:/api/index Metric:http.service.serviceB.count Step:15 Value:20 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
-{Endpoint:/api/index Metric:http.service.serviceB.0.75 Step:15 Value:589.5 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
-{Endpoint: Metric:http.service.serviceA.min Step:15 Value:414 Type:Gauge Labels:map[] Timestamp:1590776849}
-{Endpoint:/api/index Metric:http.service.serviceB.mean Step:15 Value:414 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
-{Endpoint:/api/index Metric:http.service.serviceB.0.50 Step:15 Value:394 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
-{Endpoint: Metric:http.service.serviceA.max Step:15 Value:968 Type:Gauge Labels:map[] Timestamp:1590776849}
-{Endpoint:/api/index Metric:http.service.serviceB.max Step:15 Value:968 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
+{Endpoint:echo Metric:http.service.max Step:15 Value:590 Type:Gauge Labels:map[endpoint:echo status:200 uri:/api/index] Timestamp:1590778743}
+{Endpoint:echo Metric:http.service.0.75 Step:15 Value:460.5 Type:Gauge Labels:map[endpoint:echo status:200 uri:/api/index] Timestamp:1590778743}
+{Endpoint:echo Metric:http.service.0.99 Step:15 Value:590 Type:Gauge Labels:map[endpoint:echo status:200 uri:/api/index] Timestamp:1590778743}
+{Endpoint:echo Metric:http.service.count Step:15 Value:20 Type:Gauge Labels:map[endpoint:echo status:404 uri:/api/noexists] Timestamp:1590778743}
+{Endpoint:echo Metric:http.service.0.50 Step:15 Value:325.5 Type:Gauge Labels:map[endpoint:echo status:404 uri:/api/noexists] Timestamp:1590778743}
+{Endpoint:echo Metric:http.service.0.75 Step:15 Value:460.5 Type:Gauge Labels:map[endpoint:echo status:404 uri:/api/noexists] Timestamp:1590778743}
+{Endpoint:echo Metric:http.service.0.90 Step:15 Value:572.4000000000001 Type:Gauge Labels:map[endpoint:echo status:404 uri:/api/noexists] Timestamp:1590778743}
+{Endpoint:echo Metric:http.service.0.99 Step:15 Value:590 Type:Gauge Labels:map[endpoint:echo status:404 uri:/api/noexists] Timestamp:1590778743}
 ...
 ```
 

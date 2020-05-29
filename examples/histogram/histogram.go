@@ -13,22 +13,12 @@ const (
 )
 
 var (
-	serviceA = aura.NewHistogram(
-		"http.service.serviceA",
-		"example:serviceA",
+	echo = aura.NewHistogramVec(
+		"http.service",
+		"simple echo service",
 		step,
 		15*time.Second,
-		&aura.HistogramOpts{
-			HVTypes: []aura.HistogramVType{aura.HistogramVTMin, aura.HistogramVTMax, aura.HistogramVTMean},
-		},
-	)
-
-	serviceB = aura.NewHistogramVec(
-		"http.service.serviceB",
-		"exmaple:serviceB",
-		step,
-		15*time.Second,
-		[]string{"endpoint", "status"},
+		[]string{"endpoint", "uri", "status"},
 		&aura.HistogramOpts{
 			HVTypes: []aura.HistogramVType{
 				aura.HistogramVTMin, aura.HistogramVTMax, aura.HistogramVTMean, aura.HistogramVTCount,
@@ -40,12 +30,16 @@ var (
 
 func main() {
 	registry := aura.NewRegistry(nil)
-	registry.MustRegister(serviceA, serviceB)
+	registry.MustRegister(echo)
 
 	go func() {
 		for range time.Tick(200 * time.Millisecond) {
-			serviceA.Observe(rand.Int63() % 1000)
-			serviceB.WithLabelValues("/api/index", "200").Observe(rand.Int63() % 600)
+			echo.WithLabelValues("echo", "/api/index", "200").Observe(rand.Int63() % 600)
+			echo.With(map[string]string{
+				"endpoint": "echo",
+				"uri":      "/api/noexists",
+				"status":   "404",
+			}).Observe(rand.Int63() % 600)
 		}
 	}()
 
