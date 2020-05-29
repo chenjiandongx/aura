@@ -95,7 +95,7 @@ type Timer interface {
 
 ## 📝 Usage
 
-#### Collector 基本用法
+### Collector 基本用法
 
 ```golang
 package main
@@ -164,23 +164,24 @@ func (c *CPUCollector) Collect(ch chan<- aura.Metric) {
 }
 
 func main() {
-    // (1) 创建一个 Rigistry 对象
-    registry := aura.NewRegistry(nil)
-    // (2) 注册 Collector
-    registry.MustRegister(&CPUCollector{})
-    // (3) 注册 Reporter
-    // reporter 负责将 metrics 输送到任意后端，开发者可自行为 registry 提供定制化后端
-    // reporter.DefaultStreamReporter 会将采集的指标输出到 stdout
+	// (1) 创建一个 Rigistry 对象
+	registry := aura.NewRegistry(nil)
+	// (2) 注册 Collector
+	registry.MustRegister(&CPUCollector{})
+	// (3) 注册 Reporter
+	// reporter 负责将 metrics 输送到任意后端，开发者可自行为 registry 提供定制化后端
+	// reporter.DefaultStreamReporter 会将采集的指标输出到 stdout
 	registry.AddReporter(reporter.DefaultStreamReporter)
 
-    // 可选项：Serve 将会启动一个 HTTP 服务用于提供 collector 本身运行的信息。
-    go registry.Serve("127.0.0.1:9099")
-    // (4) 开始采集指标
+	// 可选项：Serve 将会启动一个 HTTP 服务用于提供 collector 本身运行的信息。
+	go registry.Serve("127.0.0.1:9099")
+	// (4) 开始采集指标
 	registry.Run()
 }
 ```
 
-运行结果
+**运行结果**
+
 ```shell
 ~/project/golang/src/github.com/chenjiandongx/aura/examples/desc 🤔 go run .
 {Endpoint: Metric:host.cpu.loadavg.15 Step:10 Value:2.01318359375 Type:Gauge Labels:map[] Timestamp:1590776801}
@@ -194,7 +195,36 @@ func main() {
 ...
 ```
 
-**客户端埋点形式**
+**Collector 指标及运行状态**
+
+```shell
+~/project/golang/src/github.com/chenjiandongx/aura 🤔 curl -s http://localhost:9099/-/metadata | jq
+[
+  {
+    "metric": "host.cpu.loadavg.1",
+    "help": "CPU load average over the last 1 minute",
+    "step": 10
+  },
+  {
+    "metric": "host.cpu.loadavg.5",
+    "help": "load average over the last 5 minute",
+    "step": 10
+  },
+  {
+    "metric": "host.cpu.loadavg.15",
+    "help": "load average over the last 15 minute",
+    "step": 10
+  }
+]
+~/project/golang/src/github.com/chenjiandongx/aura 🤔 curl -s http://localhost:9099/-/stats | jq
+{
+  "metricsChanCap": 2500,
+  "metricsChanLen": 0
+}
+```
+
+
+### 客户端埋点形式
 ```golang
 package main
 
@@ -273,7 +303,7 @@ func main() {
 ...
 ```
 
-Aura 提供了一些示例位于 examples 文件下；同时也基于 [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter) 定制了 [memcached-eollector](https://github.com/chenjiandongx/memcached-collector)，作为一个标准 collector 写法供使用的同学参考。
+Aura 提供了一些示例位于 examples 文件下；同时也基于 [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter) 开发了 [memcached-eollector](https://github.com/chenjiandongx/memcached-collector)，作为一个标准 collector 写法供使用的同学参考。
 
 ### 📃 License
 
