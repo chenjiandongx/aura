@@ -183,15 +183,14 @@ func main() {
 运行结果
 ```shell
 ~/project/golang/src/github.com/chenjiandongx/aura/examples/desc 🤔 go run .
-{Endpoint: Metric:host.cpu.loadavg.5 Step:10 Value:1.98876953125 Type:Gauge Labels:map[] Timestamp:1590771360}
-{Endpoint: Metric:host.cpu.loadavg.1 Step:10 Value:2.10302734375 Type:Gauge Labels:map[] Timestamp:1590771360}
-{Endpoint: Metric:host.cpu.loadavg.5 Step:10 Value:1.98876953125 Type:Gauge Labels:map[] Timestamp:1590771360}
-{Endpoint: Metric:host.cpu.loadavg.5 Step:10 Value:1.98876953125 Type:Gauge Labels:map[] Timestamp:1590771360}
-{Endpoint: Metric:host.cpu.loadavg.15 Step:10 Value:1.95556640625 Type:Gauge Labels:map[] Timestamp:1590771360}
-{Endpoint: Metric:host.cpu.loadavg.15 Step:10 Value:1.95556640625 Type:Gauge Labels:map[] Timestamp:1590771360}
-{Endpoint: Metric:host.cpu.loadavg.1 Step:10 Value:2.10302734375 Type:Gauge Labels:map[] Timestamp:1590771360}
-{Endpoint: Metric:host.cpu.loadavg.5 Step:10 Value:1.98876953125 Type:Gauge Labels:map[] Timestamp:1590771360}
-{Endpoint: Metric:host.cpu.loadavg.15 Step:10 Value:1.95556640625 Type:Gauge Labels:map[] Timestamp:1590771360}
+{Endpoint: Metric:host.cpu.loadavg.15 Step:10 Value:2.01318359375 Type:Gauge Labels:map[] Timestamp:1590776801}
+{Endpoint: Metric:host.cpu.loadavg.15 Step:10 Value:2.01318359375 Type:Gauge Labels:map[] Timestamp:1590776803}
+{Endpoint: Metric:host.cpu.loadavg.15 Step:10 Value:2.01318359375 Type:Gauge Labels:map[] Timestamp:1590776805}
+{Endpoint: Metric:host.cpu.loadavg.1 Step:10 Value:1.60791015625 Type:Gauge Labels:map[] Timestamp:1590776807}
+{Endpoint: Metric:host.cpu.loadavg.5 Step:10 Value:2.02587890625 Type:Gauge Labels:map[] Timestamp:1590776801}
+{Endpoint: Metric:host.cpu.loadavg.5 Step:10 Value:2.02587890625 Type:Gauge Labels:map[] Timestamp:1590776803}
+{Endpoint: Metric:host.cpu.loadavg.1 Step:10 Value:1.748046875 Type:Gauge Labels:map[] Timestamp:1590776805}
+{Endpoint: Metric:host.cpu.loadavg.15 Step:10 Value:2.0009765625 Type:Gauge Labels:map[] Timestamp:1590776807}
 ...
 ```
 
@@ -259,15 +258,14 @@ func main() {
 运行结果
 ```shell
 ~/project/golang/src/github.com/chenjiandongx/aura/examples/histogram 🤔 go run .
-{Endpoint: Metric:http.service.serviceA.min Step:15 Value:414 Type:Gauge Labels:map[] Timestamp:1590771446}
-{Endpoint:/api/index Metric:http.service.serviceB.max Step:15 Value:968 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590771446}
-{Endpoint:/api/index Metric:http.service.serviceB.0.90 Step:15 Value:931.6000000000001 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590771446}
-{Endpoint:/api/index Metric:http.service.serviceB.min Step:15 Value:414 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590771446}
-{Endpoint:/api/index Metric:http.service.serviceB.0.50 Step:15 Value:394 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590771446}
-{Endpoint:/api/index Metric:http.service.serviceB.0.99 Step:15 Value:968 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590771446}
-{Endpoint: Metric:http.service.serviceA.max Step:15 Value:968 Type:Gauge Labels:map[] Timestamp:1590771446}
-{Endpoint:/api/index Metric:http.service.serviceB.mean Step:15 Value:414 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590771446}
-{Endpoint: Metric:http.service.serviceA.mean Step:15 Value:414 Type:Gauge Labels:map[] Timestamp:1590771446}
+{Endpoint:/api/index Metric:http.service.serviceB.min Step:15 Value:414 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
+{Endpoint:/api/index Metric:http.service.serviceB.count Step:15 Value:20 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
+{Endpoint:/api/index Metric:http.service.serviceB.0.75 Step:15 Value:589.5 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
+{Endpoint: Metric:http.service.serviceA.min Step:15 Value:414 Type:Gauge Labels:map[] Timestamp:1590776849}
+{Endpoint:/api/index Metric:http.service.serviceB.mean Step:15 Value:414 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
+{Endpoint:/api/index Metric:http.service.serviceB.0.50 Step:15 Value:394 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
+{Endpoint: Metric:http.service.serviceA.max Step:15 Value:968 Type:Gauge Labels:map[] Timestamp:1590776849}
+{Endpoint:/api/index Metric:http.service.serviceB.max Step:15 Value:968 Type:Gauge Labels:map[endpoint:/api/index status:200] Timestamp:1590776849}
 ...
 ```
 

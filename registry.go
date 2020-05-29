@@ -29,7 +29,7 @@ type Registry struct {
 	opts       *RegistryOpts
 	reporter   Reporter
 	mtx        sync.RWMutex
-	collectors map[string]Collector
+	collectors []Collector
 	metricChs  chan Metric
 	metadata   map[string]*MetaData
 	stop       chan struct{}
@@ -62,7 +62,7 @@ func NewRegistry(opts *RegistryOpts) *Registry {
 		opts:       opts,
 		reporter:   nil,
 		mtx:        sync.RWMutex{},
-		collectors: map[string]Collector{},
+		collectors: []Collector{},
 		metricChs:  make(chan Metric, opts.CapMetricChan),
 		metadata:   map[string]*MetaData{},
 		stop:       make(chan struct{}),
@@ -104,9 +104,9 @@ func (r *Registry) Register(c Collector) error {
 			Help:   desc.help,
 			Step:   desc.step,
 		}
-		r.collectors[desc.fqName] = c
 	}
 
+	r.collectors = append(r.collectors, c)
 	return nil
 }
 
