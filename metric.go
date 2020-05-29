@@ -23,7 +23,7 @@ type Metric struct {
 	Timestamp int64
 }
 
-func makeLabelPairs(fqname string, keys []string, values []string) string {
+func makeLabelPairs(fqname string, keys, values []string) string {
 	buf := &bytes.Buffer{}
 	buf.WriteString(fqname)
 	for idx, k := range keys {
@@ -37,7 +37,7 @@ func makeLabelPairs(fqname string, keys []string, values []string) string {
 	return buf.String()
 }
 
-func makeLabelMap(keys []string, values []string) map[string]string {
+func makeLabelMap(keys, values []string) map[string]string {
 	m := make(map[string]string)
 	for i, k := range keys {
 		m[k] = values[i]

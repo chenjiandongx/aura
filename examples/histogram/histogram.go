@@ -51,6 +51,6 @@ func main() {
 
 	registry.AddReporter(reporter.DefaultStreamReporter)
 
-	go registry.Serve("localhost:9090")
+	go registry.Serve("localhost:9099")
 	registry.Run()
 }

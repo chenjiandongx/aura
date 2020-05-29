@@ -7,6 +7,7 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
+// Counter is just a gauge for an AtomicLong instance. You can increment or decrement its value.
 type Counter interface {
 	Collector
 
@@ -59,14 +60,17 @@ func (c *counter) Count() int64 {
 	return c.self.Count()
 }
 
+// Interval implements aura.Collector.
 func (c *counter) Interval() time.Duration {
 	return c.interval
 }
 
+// Describe implements aura.Collector.
 func (c *counter) Describe(ch chan<- *Desc) {
 	ch <- c.Desc
 }
 
+// Collect implements aura.Collector.
 func (c *counter) Collect(ch chan<- Metric) {
 	ch <- c.popMetric(c.Desc)
 }

@@ -22,10 +22,9 @@ type HTTPReportedMetric struct {
 	Timestamp int64       `json:"timestamp"`
 }
 
-var defaultHTTPClient *resty.Client
+var defaultHTTPClient = resty.New()
 
 func init() {
-	defaultHTTPClient = resty.New()
 	defaultHTTPClient.SetTimeout(5 * time.Second)
 	defaultHTTPClient.SetRetryCount(3)
 }
@@ -34,10 +33,11 @@ var DefaultHTTPReporter = &HTTPReporter{
 	client:         defaultHTTPClient,
 	Urls:           []string{},
 	Batch:          200,
-	Ticker:         time.Tick(5 * time.Second),
+	Ticker:         time.Tick(3 * time.Second),
 	Timeout:        5 * time.Second,
 	RetryCount:     3,
 	MaxConcurrency: 3,
+	DropEndpoint:   false,
 }
 
 type HTTPReporter struct {
@@ -48,9 +48,10 @@ type HTTPReporter struct {
 	Timeout        time.Duration
 	RetryCount     int
 	MaxConcurrency int
+	DropEndpoint   bool
 }
 
-func (r *HTTPReporter) Convert(m aura.Metric) interface{} {
+func (r *HTTPReporter) convert(m aura.Metric) interface{} {
 	keys := make([]string, 0)
 	for k := range m.Labels {
 		keys = append(keys, k)
@@ -59,6 +60,10 @@ func (r *HTTPReporter) Convert(m aura.Metric) interface{} {
 	sort.Strings(keys)
 	buf := &bytes.Buffer{}
 	for idx, k := range keys {
+		if r.DropEndpoint && k == "endpoint" {
+			continue
+		}
+
 		if idx == len(keys)-1 {
 			buf.WriteString(fmt.Sprintf("%s=%s", k, m.Labels[k]))
 			continue
@@ -74,6 +79,34 @@ func (r *HTTPReporter) Convert(m aura.Metric) interface{} {
 		Tags:      buf.String(),
 		Timestamp: m.Timestamp,
 	}
+}
+
+func (r *HTTPReporter) report(mets []aura.Metric) error {
+	items := make([]interface{}, 0)
+	for _, met := range mets {
+		items = append(items, r.convert(met))
+	}
+
+	bs, err := json.Marshal(items)
+	if err != nil {
+		return err
+	}
+
+	ok := false
+	indexes := rand.Perm(len(r.Urls))
+	for _, i := range indexes {
+		_, err := r.client.R().SetBody(bs).Post(r.Urls[i])
+		if err != nil {
+			continue
+		}
+		ok = true
+	}
+
+	if !ok {
+		return fmt.Errorf("failed to report metrics")
+	}
+
+	return nil
 }
 
 func (r *HTTPReporter) Report(ch chan aura.Metric) {
@@ -92,41 +125,11 @@ func (r *HTTPReporter) Report(ch chan aura.Metric) {
 					ms = append(ms, metric)
 				case <-r.Ticker:
 					if err := r.report(ms); err != nil {
-
+						// what should I do here?
 					}
 					ms = make([]aura.Metric, 0)
 				}
 			}
 		}()
 	}
-}
-
-func (r *HTTPReporter) report(mets []aura.Metric) error {
-	items := make([]interface{}, 0)
-	for _, met := range mets {
-		items = append(items, r.Convert(met))
-	}
-
-	bs, err := json.Marshal(items)
-	if err != nil {
-		return err
-	}
-
-	ok := false
-
-	indexes := rand.Perm(len(r.Urls))
-	for _, i := range indexes {
-		_, err := r.client.R().SetBody(bs).Post(r.Urls[i])
-		if err != nil {
-			continue
-		}
-		ok = true
-	}
-
-	if !ok {
-		// todo
-		return fmt.Errorf("")
-	}
-
-	return nil
 }

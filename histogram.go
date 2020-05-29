@@ -7,6 +7,9 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
+// Histogram measures the statistical distribution of values in a stream of data.
+// In addition to minimum, maximum, mean, etc.
+// it also measures median, 75th, 90th, 95th, 98th, 99th, and 99.9th percentiles.
 type Histogram interface {
 	Collector
 
@@ -103,14 +106,17 @@ func (h *histogram) Observe(i int64) {
 	h.self.Update(i)
 }
 
+// Interval implements aura.Collector.
 func (h *histogram) Interval() time.Duration {
 	return h.interval
 }
 
+// Describe implements aura.Collector.
 func (h *histogram) Describe(ch chan<- *Desc) {
 	ch <- h.Desc
 }
 
+// Collect implements aura.Collector.
 func (h *histogram) Collect(ch chan<- Metric) {
 	for _, hvt := range h.opts.HVTypes {
 		ch <- h.popMetricWithHVT(h.Desc, hvt)

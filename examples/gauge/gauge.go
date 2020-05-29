@@ -57,6 +57,6 @@ func main() {
 		}
 	}()
 
-	go registry.Serve("127.0.0.1:9090")
+	go registry.Serve("127.0.0.1:9099")
 	registry.Run()
 }

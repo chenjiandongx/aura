@@ -7,6 +7,8 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
+// Gauge is an instantaneous measurement of a value.
+// For example, we may want to measure the number of pending jobs in a queue.
 type Gauge interface {
 	Collector
 
@@ -49,14 +51,17 @@ func (g *gauge) Value() float64 {
 	return g.self.Value()
 }
 
+// Interval implements aura.Collector.
 func (g *gauge) Interval() time.Duration {
 	return g.interval
 }
 
+// Describe implements aura.Collector.
 func (g *gauge) Describe(ch chan<- *Desc) {
 	ch <- g.Desc
 }
 
+// Collect implements aura.Collector.
 func (g *gauge) Collect(ch chan<- Metric) {
 	ch <- g.popMetric(g.Desc)
 }

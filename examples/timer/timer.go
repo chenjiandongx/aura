@@ -11,7 +11,7 @@ import (
 var (
 	timerA = aura.NewTimer(
 		"host.timerA",
-		"it's the timerA to record something",
+		"example:timerA",
 		15,
 		15*time.Second,
 		&aura.TimerOpts{
@@ -21,10 +21,10 @@ var (
 
 	timerB = aura.NewTimerVec(
 		"host.timerB",
-		"it's the timerB to record something",
+		"example:timerB",
 		15,
 		15*time.Second,
-		[]string{"endpoint", "url"},
+		[]string{"url"},
 		&aura.TimerOpts{
 			HVTypes:     []aura.TimerVType{aura.TimerVTMin, aura.TimerVTStdDev},
 			Percentiles: []float64{0.5, 0.75, 0.9, 0.99},
@@ -39,12 +39,12 @@ func main() {
 	go func() {
 		for range time.Tick(200 * time.Millisecond) {
 			timerA.Update(time.Duration(rand.Int63()%1000) * time.Millisecond)
-			timerB.WithLabelValues("your-host", "/api/index").Update(time.Duration(rand.Int63()%600) * time.Millisecond)
+			timerB.WithLabelValues("/api/index").Update(time.Duration(rand.Int63()%600) * time.Millisecond)
 		}
 	}()
 
 	registry.AddReporter(reporter.DefaultStreamReporter)
 
-	go registry.Serve("localhost:9090")
+	go registry.Serve("localhost:9099")
 	registry.Run()
 }

@@ -7,6 +7,8 @@ import (
 	"github.com/rcrowley/go-metrics"
 )
 
+// Timer measures both the rate that a particular piece of code is
+// called and the distribution of its duration.
 type Timer interface {
 	Collector
 
@@ -119,14 +121,17 @@ func (t *timer) Time(fn func()) {
 	t.self.Time(fn)
 }
 
+// Interval implements aura.Collector.
 func (t *timer) Interval() time.Duration {
 	return t.interval
 }
 
+// Describe implements aura.Collector.
 func (t *timer) Describe(ch chan<- *Desc) {
 	ch <- t.Desc
 }
 
+// Collect implements aura.Collector.
 func (t *timer) Collect(ch chan<- Metric) {
 	for _, hvt := range t.opts.HVTypes {
 		ch <- t.popMetricWithHVT(t.Desc, hvt)

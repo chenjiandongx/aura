@@ -12,17 +12,19 @@ const (
 	defaultCapDescChan   = 20
 )
 
+// Reporter is in charge of sending metrics collected to the backend you used.
 type Reporter interface {
-	Convert(Metric) interface{}
 	Report(ch chan Metric)
 }
 
+// MetaData represents the metrics metadata for the `/-/metadata` API
 type MetaData struct {
 	Metric string `json:"metric"`
 	Help   string `json:"help"`
 	Step   uint32 `json:"step"`
 }
 
+// Registry registers aura collectors, collects their metrics.
 type Registry struct {
 	opts       *RegistryOpts
 	reporter   Reporter
@@ -121,7 +123,7 @@ func (r *Registry) gather() {
 		go func(c Collector) {
 			ticker := time.Tick(c.Interval())
 
-			time.Sleep(5 * time.Second)
+			time.Sleep(2 * time.Second)
 			c.Collect(r.metricChs)
 
 			for {

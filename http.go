@@ -24,9 +24,22 @@ func (r *Registry) apiMetadata(w http.ResponseWriter, req *http.Request) {
 	w.Write(bs)
 }
 
-// todo
 func (r *Registry) apiStats(w http.ResponseWriter, req *http.Request) {
+	type Stats struct {
+		MetricsChanCap int `json:"metricsChanCap"`
+		MetricsChanLen int `json:"metricsChanLen"`
+	}
 
+	s := Stats{
+		MetricsChanCap: cap(r.metricChs),
+		MetricsChanLen: len(r.metricChs),
+	}
+	bs, err := json.Marshal(s)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(bs)
 }
 
 func (r *Registry) Serve(address string) {

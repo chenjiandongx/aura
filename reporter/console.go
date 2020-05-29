@@ -23,6 +23,15 @@ type StreamReporter struct {
 	MaxConcurrency int
 }
 
+func (r *StreamReporter) report(mets []aura.Metric) error {
+	for _, met := range mets {
+		if _, err := fmt.Fprintf(r.Writer, "%+v\n", met); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (r *StreamReporter) Report(ch chan aura.Metric) {
 	for i := 0; i < r.MaxConcurrency; i++ {
 		go func() {
@@ -46,17 +55,4 @@ func (r *StreamReporter) Report(ch chan aura.Metric) {
 			}
 		}()
 	}
-}
-
-func (r *StreamReporter) Convert(met aura.Metric) interface{} {
-	return met
-}
-
-func (r *StreamReporter) report(mets []aura.Metric) error {
-	for _, met := range mets {
-		if _, err := fmt.Fprintf(r.Writer, "%+v\n", r.Convert(met)); err != nil {
-			return err
-		}
-	}
-	return nil
 }
