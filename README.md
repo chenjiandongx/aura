@@ -101,11 +101,11 @@ type Timer interface {
 
 ### Registry
 
-Registry 负责注册和管理 Collectors 的声明周期。
+Registry 负责注册和管理 Collectors 的生命周期。
 
 ```golang
-// RegistryOpts 用于指定 Metrics 和 Desc channel 的缓存大小，一般情况下不需要调整
-// 如果采集指标量比较大的话，可以将 CapMetricChan 值设置大一点
+// RegistryOpts 用于指定 Metrics 和 Desc channel 的缓存大小。
+// 一般情况下不需要调整，如果采集指标量比较大的话，可以将 CapMetricChan 值设置大一点。
 type RegistryOpts struct {
 	CapMetricChan int // default 2500
 	CapDescChan   int // default 20
