@@ -2,6 +2,10 @@
 
 > 🔔 Aura is a SDK for the monitoring system written in Go with love.
 
+[![GoDoc](https://godoc.org/github.com/chenjiandongx/aura?status.svg)](https://godoc.org/github.com/chenjiandongx/aura)
+[![Go Report Card](https://goreportcard.com/badge/github.com/chenjiandongx/aura)](https://goreportcard.com/report/github.com/chenjiandongx/aura)
+[![License](https://img.shields.io/badge/License-apache-brightgreen.svg)](https://www.apache.org/)
+
 ## 🎬 Overview
 
 ☁️ 在云原生时代，以 [Prometheus](https://prometheus.io) 为中心的监控生态已经逐渐完善，社区也出现了大量的中间件，数据库以及各种基础组件的 exporter，Prometheus 官方也给出了维护了一份 exporter 列表 [instrumenting/exporters](https://prometheus.io/docs/instrumenting/exporters)。
