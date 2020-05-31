@@ -42,6 +42,7 @@ func (r *Registry) apiStats(w http.ResponseWriter, req *http.Request) {
 	w.Write(bs)
 }
 
+// Serve run the HTTP server which will exports the collectors infos to the user.
 func (r *Registry) Serve(address string) {
 	http.HandleFunc("/-/health", r.apiHealth)
 	http.HandleFunc("/-/metadata", r.apiMetadata)

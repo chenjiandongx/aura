@@ -44,18 +44,22 @@ func (c *counter) popMetric(desc *Desc) Metric {
 	}
 }
 
+// Inc increases the counter.
 func (c *counter) Inc(i int64) {
 	c.self.Inc(i)
 }
 
+// Dec decreases the counter.
 func (c *counter) Dec(i int64) {
 	c.self.Dec(i)
 }
 
+// Clear resets the counter to zero.
 func (c *counter) Clear() {
 	c.self.Clear()
 }
 
+// Count returns the number of the counter.
 func (c *counter) Count() int64 {
 	return c.self.Count()
 }
@@ -111,14 +115,17 @@ func (cv *CounterVec) searchCounter(lvs ...string) Counter {
 	return cv.counters[lbp]
 }
 
+// Interval implements aura.Collector.
 func (cv *CounterVec) Interval() time.Duration {
 	return cv.interval
 }
 
+// Describe implements aura.Collector.
 func (cv *CounterVec) Describe(ch chan<- *Desc) {
 	ch <- cv.Desc
 }
 
+// Collect implements aura.Collector.
 func (cv *CounterVec) Collect(ch chan<- Metric) {
 	for _, c := range cv.counters {
 		ch <- c.popMetric(cv.Desc)

@@ -394,7 +394,7 @@ func main() {
 ...
 ```
 
-Aura 提供了一些示例位于 [examples](https://github.com/chenjiandongx/aura/tree/master/examples) 文件夹。同时也基于 [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter) 开发了 [memcached-eollector](https://github.com/chenjiandongx/memcached-collector)，作为一个标准 collector 写法供使用的同学参考。
+Aura 提供了一些示例位于 [examples](https://github.com/chenjiandongx/aura/tree/master/examples) 文件夹。同时也基于 [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter) 开发了 [memcached-collector](https://github.com/chenjiandongx/memcached-collector)，作为一个标准 collector 写法供使用的同学参考。
 
 ### 📃 License
 
