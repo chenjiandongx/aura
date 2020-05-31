@@ -95,6 +95,21 @@ type Timer interface {
 
 ## 📝 Usage
 
+### Registry
+
+Registry 负责注册和管理 Collectors 的声明周期。
+
+```golang
+// RegistryOpts 用于指定 Metrics 和 Desc channel 的缓存大小，一般情况下不需要调整
+// 如果采集指标量比较大的话，可以将 CapMetricChan 值设置大一点
+type RegistryOpts struct {
+	CapMetricChan int // default 2500
+	CapDescChan   int // default 20
+}
+
+func NewRegistry(opts *RegistryOpts) *Registry
+```
+
 ### Collector 基本用法
 
 ```golang
@@ -225,6 +240,7 @@ func main() {
 
 
 ### 客户端埋点形式
+
 ```golang
 package main
 
@@ -304,8 +320,78 @@ func main() {
 ...
 ```
 
+### 自定义 Reporter
+
+```golang
+package main
+
+import (
+	"os"
+	"time"
+
+	"github.com/chenjiandongx/aura"
+)
+
+var (
+	// declare metrics
+	uptime = aura.NewCounter(
+		"service.uptime",
+		"service uptime in seconds",
+		5,
+		5*time.Second,
+	)
+)
+
+type MyReporter struct{}
+
+// Custom reporter which will writes data the local file.
+func (r MyReporter) Report(ch chan aura.Metric) {
+	filename := "metrics.log"
+
+	f, err := os.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	for m := range ch {
+		if _, err := f.WriteString(m.String() + "\n"); err != nil {
+			panic(err)
+		}
+	}
+}
+
+func main() {
+	registry := aura.NewRegistry(nil)
+	registry.MustRegister(uptime)
+
+	go func() {
+		for range time.Tick(1 * time.Second) {
+			uptime.Inc(1)
+		}
+	}()
+
+	registry.AddReporter(MyReporter{})
+	registry.Run()
+}
+```
+
+**运行结果**
+
+```shell
+~/project/golang/src/github.com/chenjiandongx/aura/examples/reporter 🤔 tail -f metrics.log
+<Metadata Endpoint:, Metric:service.uptime, Type:Counter Timestamp:1590945775, Step:5, Value:1, Tags:map[]>
+<Metadata Endpoint:, Metric:service.uptime, Type:Counter Timestamp:1590945778, Step:5, Value:5, Tags:map[]>
+<Metadata Endpoint:, Metric:service.uptime, Type:Counter Timestamp:1590945783, Step:5, Value:10, Tags:map[]>
+<Metadata Endpoint:, Metric:service.uptime, Type:Counter Timestamp:1590945788, Step:5, Value:15, Tags:map[]>
+<Metadata Endpoint:, Metric:service.uptime, Type:Counter Timestamp:1590945793, Step:5, Value:19, Tags:map[]>
+<Metadata Endpoint:, Metric:service.uptime, Type:Counter Timestamp:1590945798, Step:5, Value:25, Tags:map[]>
+<Metadata Endpoint:, Metric:service.uptime, Type:Counter Timestamp:1590945803, Step:5, Value:29, Tags:map[]>
+<Metadata Endpoint:, Metric:service.uptime, Type:Counter Timestamp:1590945808, Step:5, Value:34, Tags:map[]>
+...
+```
+
 Aura 提供了一些示例位于 [examples](https://github.com/chenjiandongx/aura/tree/master/examples) 文件夹。同时也基于 [prometheus/memcached_exporter](https://github.com/prometheus/memcached_exporter) 开发了 [memcached-eollector](https://github.com/chenjiandongx/memcached-collector)，作为一个标准 collector 写法供使用的同学参考。
 
 ### 📃 License
 
-Apache License [©chenjiandongx](https://github.com/chenjiandongx)
+[Apache License v2](https://github.com/chenjiandongx/aura/LICENSE)

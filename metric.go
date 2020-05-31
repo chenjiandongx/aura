@@ -23,6 +23,11 @@ type Metric struct {
 	Timestamp int64
 }
 
+func (m Metric) String() string {
+	return fmt.Sprintf("<Metadata Endpoint:%s, Metric:%s, Type:%s Timestamp:%d, Step:%d, Value:%v, Tags:%v>",
+		m.Endpoint, m.Metric, m.Type, m.Timestamp, m.Step, m.Value, m.Labels)
+}
+
 func makeLabelPairs(fqname string, keys, values []string) string {
 	buf := &bytes.Buffer{}
 	buf.WriteString(fqname)
