@@ -1,6 +1,6 @@
 # Aura
 
-> 🔔 Aura is a SDK for the monitoring system written in Go with love.
+> 🔔 Aura is an SDK for the monitoring system written in Go with love.
 
 [![GoDoc](https://godoc.org/github.com/chenjiandongx/aura?status.svg)](https://godoc.org/github.com/chenjiandongx/aura)
 [![Go Report Card](https://goreportcard.com/badge/github.com/chenjiandongx/aura)](https://goreportcard.com/report/github.com/chenjiandongx/aura)
