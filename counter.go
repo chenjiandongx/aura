@@ -13,6 +13,7 @@ type Counter interface {
 
 	Clear()
 	Count() int64
+	Rate() float64
 	Dec(int64)
 	Inc(int64)
 }
@@ -20,6 +21,7 @@ type Counter interface {
 type counter struct {
 	*Desc
 
+	prev     int64
 	self     metrics.Counter
 	labels   map[string]string
 	interval time.Duration
@@ -33,15 +35,20 @@ type CounterVec struct {
 }
 
 func (c *counter) popMetric(desc *Desc) Metric {
-	return Metric{
+	cnt := c.self.Count()
+
+	m := Metric{
 		Endpoint:  c.labels["endpoint"],
 		Metric:    desc.fqName,
 		Step:      desc.step,
-		Value:     c.self.Count(),
-		Type:      CounterValue,
+		Value:     c.Rate(),
+		Type:      GaugeValue,
 		Labels:    c.labels,
 		Timestamp: time.Now().Unix(),
 	}
+
+	c.prev = cnt
+	return m
 }
 
 // Inc increases the counter.
@@ -62,6 +69,11 @@ func (c *counter) Clear() {
 // Count returns the number of the counter.
 func (c *counter) Count() int64 {
 	return c.self.Count()
+}
+
+// Rate returns the increasing rate of the counter
+func (c *counter) Rate() float64 {
+	return float64(c.self.Count()-c.prev) / float64(c.Desc.step)
 }
 
 // Interval implements aura.Collector.
@@ -109,7 +121,7 @@ func (cv *CounterVec) searchCounter(lvs ...string) Counter {
 	lbm := makeLabelMap(cv.Desc.labelKeys, lvs)
 	_, ok := cv.counters[lbp]
 	if !ok {
-		cv.counters[lbp] = &counter{self: metrics.NewCounter(), labels: lbm}
+		cv.counters[lbp] = &counter{self: metrics.NewCounter(), labels: lbm, Desc: &Desc{step: cv.step}}
 	}
 
 	return cv.counters[lbp]

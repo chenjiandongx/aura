@@ -57,6 +57,7 @@ type Counter interface {
 
 	Clear()
 	Count() int64
+	Rate() float64
 	Dec(int64)
 	Inc(int64)
 }
